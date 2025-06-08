@@ -1,0 +1,34 @@
+
+Clona el repo y entra a la carpeta.
+Crea y activa el entorno virtual.
+Instala dependencias.
+pip install -r requirements.txt
+
+Aplica migraciones.
+Ejecuta python manage.py load_mbi_questions.
+Copia las imágenes a img.
+Ejecuta el servidor.
+¡Listo!
+
+TeamZen es una plataforma web para gestión de equipos y bienestar laboral. 
+Permite a los usuarios crear y administrar equipos, gestionar solicitudes de ingreso, 
+y aplicar el test MBI (Maslach Burnout Inventory) para evaluar el nivel de burnout de los 
+miembros. Ofrece interpretaciones personalizadas de los resultados y herramientas para mejorar 
+el ambiente y la salud mental en equipos de trabajo.
+
+en la mbi/commands hay un script para poblar la bd
+
+Usuarios y contraseñas:
+
+líder: lider / demo123
+burnout1, burnout2, burnout3, burnout4: burnoutX / demo123
+zen1, zen2, zen3, zen4: zenX / demo123
+Resultado:
+
+En Equipo Burnout: 3 trabajadores muestran burnout, 1 no ha respondido.
+En Equipo Zen: 3 trabajadores muestran bienestar, 1 no ha respondido.
+
+ejecuta con python manage.py poblar_demo
+
+super user: admin
+contraseña: admin123

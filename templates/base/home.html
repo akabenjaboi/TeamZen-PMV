@@ -1,0 +1,145 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Inicio | TeamZen{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        background-color: #E5D9B6;
+    }
+    .teamzen-hero {
+        background: linear-gradient(135deg, #A4BE7B 0%, #5F8D4E 100%);
+        color: #fff;
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        margin-top: 3rem;
+        box-shadow: 0 4px 24px rgba(40,84,48,0.08);
+    }
+    .feature-icon {
+        background: #5F8D4E;
+        color: #fff;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .feature-card {
+        background: #fff;
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 2px 12px rgba(40,84,48,0.06);
+        transition: transform 0.2s;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 6px 24px rgba(40,84,48,0.12);
+    }
+    .btn-teamzen {
+        background: #285430;
+        color: #fff;
+        border: none;
+    }
+    .btn-teamzen:hover {
+        background: #5F8D4E;
+        color: #fff;
+    }
+    .teamzen-footer {
+        background: #285430;
+        color: #fff;
+        padding: 2rem 0 1rem 0;
+        margin-top: 4rem;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+    }
+    .teamzen-footer a {
+        color: #A4BE7B;
+        text-decoration: underline;
+    }
+    .teamzen-footer a:hover {
+        color: #E5D9B6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="teamzen-hero text-center">
+        <h1 class="display-4 fw-bold mb-3">Bienvenido a TeamZen</h1>
+        <p class="lead mb-4">La plataforma para medir y reducir el <strong>burnout</strong> en equipos de trabajo.</p>
+        {% if not user.is_authenticated %}
+            <div class="alert alert-warning mt-4" role="alert">
+                Debes iniciar sesión para acceder a todas las funcionalidades.
+            </div>
+            <a href="{% url 'login' %}" class="btn btn-teamzen btn-lg mt-2 me-2">Iniciar sesión</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg mt-2">Registrarse</a>
+        {% else %}
+            <div class="alert alert-success mt-4" role="alert">
+                ¡Hola, {{ user.username }}! Nos alegra verte de nuevo.
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row mt-5 g-4">
+        <div class="col-md-4">
+            <div class="card feature-card h-100 text-center p-3">
+                <div class="feature-icon mx-auto mb-2">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h5 class="fw-bold" style="color:#285430;">Gestión de Equipos</h5>
+                <p>Crea, lidera o únete a equipos de trabajo. Los líderes pueden gestionar solicitudes y ver el estado de sus equipos.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card h-100 text-center p-3">
+                <div class="feature-icon mx-auto mb-2" style="background:#A4BE7B;">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+                <h5 class="fw-bold" style="color:#5F8D4E;">Test MBI</h5>
+                <p>Completa el cuestionario MBI para evaluar tu nivel de burnout. Resultados privados y análisis automáticos para cada usuario.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card h-100 text-center p-3">
+                <div class="feature-icon mx-auto mb-2" style="background:#E5D9B6; color:#285430;">
+                    <i class="bi bi-bar-chart-line"></i>
+                </div>
+                <h5 class="fw-bold" style="color:#A4BE7B;">Analítica de Bienestar</h5>
+                <p>Los líderes pueden visualizar tendencias generales de bienestar y detectar posibles casos de burnout en sus equipos.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 justify-content-center">
+        <div class="col-md-10">
+            <div class="card p-4" style="background:#fff; border-radius:1rem;">
+                <h4 class="mb-3" style="color:#5F8D4E;">¿Por qué usar TeamZen?</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill" style="color:#A4BE7B;"></i> Plataforma segura y confidencial.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill" style="color:#A4BE7B;"></i> Fomenta el bienestar y la productividad.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill" style="color:#A4BE7B;"></i> Fácil de usar para empleados y líderes.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill" style="color:#A4BE7B;"></i> Basado en el reconocido test Maslach Burnout Inventory (MBI).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="teamzen-footer mt-5">
+    <div class="container text-center">
+        <div class="mb-2">
+            <strong>TeamZen</strong> &copy; {{ now|date:"Y" }}. Todos los derechos reservados.
+        </div>
+        <div>
+            Desarrollado por el equipo TeamZen | 
+            <a href="mailto:soporte@teamzen.com">Contacto</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+{% endblock %}

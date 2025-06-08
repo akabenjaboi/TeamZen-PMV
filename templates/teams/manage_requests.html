@@ -1,0 +1,92 @@
+<!-- filepath: templates/teams/manage_requests.html -->
+{% extends 'base/base.html' %}
+{% block title %}Solicitudes de {{ team.name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .manage-requests-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 2px 16px 0 rgba(164,190,123,0.10);
+        padding: 2.5rem 2rem 2rem 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    .manage-requests-table th, .manage-requests-table td {
+        vertical-align: middle !important;
+        text-align: center;
+    }
+    .manage-requests-table th {
+        background: #A4BE7B;
+        color: #285430;
+        font-weight: 600;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        font-size: 1.08rem;
+    }
+    .manage-requests-table tr {
+        transition: background 0.2s;
+    }
+    .manage-requests-table tr:hover {
+        background: #f6fbe9;
+    }
+    .manage-requests-table td {
+        font-size: 1.04rem;
+    }
+    .manage-requests-table .btn {
+        min-width: 80px;
+        font-size: 0.98rem;
+    }
+    .manage-requests-table .btn-success {
+        background: #5F8D4E;
+        border: none;
+    }
+    .manage-requests-table .btn-danger {
+        background: #E36464;
+        border: none;
+    }
+    .manage-requests-table .btn-success:hover,
+    .manage-requests-table .btn-danger:hover {
+        opacity: 0.85;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="manage-requests-card">
+            <h2 class="mb-4 text-center">Solicitudes pendientes para <span style="color:#5F8D4E;">{{ team.name }}</span></h2>
+            {% if solicitudes %}
+                <table class="table manage-requests-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solicitud in solicitudes %}
+                        <tr>
+                            <td>{{ solicitud.user.username }}</td>
+                            <td>{{ solicitud.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="req_id" value="{{ solicitud.id }}">
+                                    <button name="action" value="aceptar" class="btn btn-success btn-sm me-2">Aceptar</button>
+                                    <button name="action" value="rechazar" class="btn btn-danger btn-sm">Rechazar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info text-center">No hay solicitudes pendientes.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

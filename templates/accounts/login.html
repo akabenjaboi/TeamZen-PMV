@@ -1,0 +1,243 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Iniciar sesión | TeamZen{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --teamzen-cream: #E5D9B6;
+        --teamzen-light-green: #A4BE7B;
+        --teamzen-medium-green: #5F8D4E;
+        --teamzen-dark-green: #285430;
+    }
+
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, var(--teamzen-cream) 0%, rgba(164, 190, 123, 0.1) 100%);
+        border-radius: 20px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(95, 141, 78, 0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 2px solid var(--teamzen-light-green);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(40, 84, 48, 0.1);
+        padding: 40px;
+        position: relative;
+        z-index: 2;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(40, 84, 48, 0.15);
+    }
+
+    .auth-title {
+        color: var(--teamzen-dark-green);
+        font-weight: 700;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .auth-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--teamzen-light-green), var(--teamzen-medium-green));
+        border-radius: 2px;
+    }
+
+    .form-label {
+        color: var(--teamzen-dark-green);
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border: 2px solid var(--teamzen-cream);
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: rgba(229, 217, 182, 0.1);
+    }
+
+    .form-control:focus {
+        border-color: var(--teamzen-medium-green);
+        box-shadow: 0 0 0 0.2rem rgba(95, 141, 78, 0.25);
+        background-color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--teamzen-medium-green), var(--teamzen-dark-green));
+        border: none;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--teamzen-dark-green), var(--teamzen-medium-green));
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 84, 48, 0.3);
+    }
+
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        color: #721c24;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .auth-link {
+        color: var(--teamzen-medium-green);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: var(--teamzen-dark-green);
+        text-decoration: underline;
+    }
+
+    .auth-footer {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--teamzen-cream);
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .auth-container {
+            margin: 10px;
+            min-height: 70vh;
+        }
+        
+        .auth-card {
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-5">
+            <div class="auth-card">
+                <h2 class="auth-title text-center">Iniciar sesión</h2>
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div class="auth-footer text-center">
+                    ¿No tienes cuenta? <a href="{% url 'register' %}" class="auth-link">Regístrate aquí</a>
+                </div>
+                <div class="text-center mt-2">
+                    <a href="{% url 'home' %}" class="auth-link d-inline-block">Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación de entrada para el formulario
+    const authCard = document.querySelector('.auth-card');
+    authCard.style.opacity = '0';
+    authCard.style.transform = 'translateY(30px)';
+    
+    setTimeout(() => {
+        authCard.style.transition = 'all 0.6s ease';
+        authCard.style.opacity = '1';
+        authCard.style.transform = 'translateY(0)';
+    }, 100);
+
+    // Efecto de focus en los inputs
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // Efecto de click en el botón
+    const submitBtn = document.querySelector('.btn-primary');
+    submitBtn.addEventListener('click', function(e) {
+        this.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            this.style.transform = 'translateY(-2px)';
+        }, 100);
+    });
+});
+</script>
+{% endblock %}
+
+{% block navbar %}{% endblock %}

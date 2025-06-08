@@ -1,0 +1,61 @@
+:root {
+    /* Fondo principal de la app */
+    --teamzen-bg: #E5D9B6;
+
+    /* Verde claro para acentos, iconos, badges, etc */
+    --teamzen-accent: #A4BE7B;
+
+    /* Verde medio para botones, hover, elementos destacados */
+    --teamzen-primary: #5F8D4E;
+
+    /* Verde oscuro para navbar, títulos, textos importantes */
+    --teamzen-dark: #285430;
+}
+
+/* Fondo general */
+html, body {
+    background-color: var(--teamzen-bg) !important;
+}
+
+/* Utilidades de color */
+.bg-teamzen-accent {
+    background-color: var(--teamzen-accent) !important;
+}
+.bg-teamzen-primary {
+    background-color: var(--teamzen-primary) !important;
+}
+.bg-teamzen-dark {
+    background-color: var(--teamzen-dark) !important;
+}
+.text-teamzen-accent {
+    color: var(--teamzen-accent) !important;
+}
+.text-teamzen-primary {
+    color: var(--teamzen-primary) !important;
+}
+.text-teamzen-dark {
+    color: var(--teamzen-dark) !important;
+}
+
+/* Botón personalizado */
+.btn-teamzen {
+    background-color: var(--teamzen-dark);
+    color: #fff;
+    border: none;
+}
+.btn-teamzen:hover {
+    background-color: var(--teamzen-primary);
+    color: #fff;
+}
+
+/* Tarjetas */
+.card-teamzen {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(40,84,48,0.08);
+    border: none;
+}
+
+.logo{
+    width: 80px;
+}

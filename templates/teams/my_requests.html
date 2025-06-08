@@ -1,0 +1,40 @@
+<!-- filepath: templates/teams/my_requests.html -->
+{% extends 'base/base.html' %}
+{% block title %}Mis Solicitudes de Equipo{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="mb-4 text-center">Mis Solicitudes de Equipo</h2>
+        {% if solicitudes %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Equipo</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td>{{ solicitud.team.name }}</td>
+                        <td>
+                            {% if solicitud.status == 'pendiente' %}
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% elif solicitud.status == 'aceptada' %}
+                                <span class="badge bg-success">Aceptada</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rechazada</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ solicitud.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info text-center">No tienes solicitudes de equipo.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

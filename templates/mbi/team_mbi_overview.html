@@ -1,0 +1,293 @@
+{% extends 'base/base.html' %}
+{% load l10n %}
+{% load tz %}
+{% load humanize %}
+{% block title %}Resumen MBI - {{ team.name }}{% endblock %}
+
+{% block extra_head %}
+<!-- Bootstrap 5 y Animate.css para animaciones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<style>
+    body {
+        background: #E5D9B6;
+    }
+    .mbi-dashboard-card {
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 24px rgba(40,84,48,0.10);
+        background: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .mbi-dashboard-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 8px 32px rgba(40,84,48,0.18);
+    }
+    .mbi-badge {
+        background: linear-gradient(135deg, #5F8D4E, #285430);
+        color: #fff;
+        border-radius: 1rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        letter-spacing: 1px;
+    }
+    .stat-animated {
+        animation: fadeInUp 0.8s;
+    }
+    .chart-responsive {
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+    .mbi-legend {
+        background: #A4BE7B22;
+        border-radius: 0.8rem;
+        padding: 1rem 1.5rem;
+        margin-top: 1.5rem;
+        color: #285430;
+        font-size: 1rem;
+    }
+    .mbi-legend strong {
+        color: #285430;
+    }
+    .mbi-legend ul {
+        margin-bottom: 0.5rem;
+    }
+    .mbi-legend li {
+        margin-bottom: 0.3rem;
+    }
+    .meses-scroll {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .meses-scroll .btn {
+        display: inline-block;
+        min-width: 120px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <span class="mbi-badge animate__animated animate__fadeInDown">Equipo: {{ team.name }}</span>
+        <h2 class="fw-bold mb-2 animate__animated animate__fadeInDown">Dashboard MBI</h2>
+        <p class="text-muted animate__animated animate__fadeInDown">Visualiza el estado de bienestar y burnout de tu equipo</p>
+    </div>
+    <div class="meses-scroll d-flex justify-content-center mb-4 flex-nowrap">
+        {% for mes in meses_disponibles %}
+            <a href="?mes={{ mes }}"
+               class="btn btn-outline-success mx-1 mb-2
+                      {% if mes == mes_actual %}active btn-success text-white fw-bold{% endif %}">
+                {{ mes|slice:"5:" }}/{{ mes|slice:":4" }}
+            </a>
+        {% endfor %}
+    </div>
+    {% with next_month=now|date:"Y-m"|add:"1"|date:"Y-m" %}
+       {% if mes_actual == mes_siguiente %}
+    <div class="alert alert-info text-center mb-4 animate__animated animate__fadeInDown">
+        Los cuestionarios estarán disponibles a inicio de mes.
+    </div>
+{% endif %}
+    {% endwith %}
+    <div class="row g-4 mb-4">
+        <!-- Estadísticas rápidas -->
+        <div class="col-6 col-md-3">
+            <div class="mbi-dashboard-card text-center p-3 stat-animated">
+                <div class="fs-2 fw-bold text-success">{{ completaron|length }}</div>
+                <div class="text-muted">Completaron</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="mbi-dashboard-card text-center p-3 stat-animated">
+                <div class="fs-2 fw-bold text-warning">{{ no_respondieron|length }}</div>
+                <div class="text-muted">Pendientes</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="mbi-dashboard-card text-center p-3 stat-animated">
+                <div class="fs-2 fw-bold text-danger">{{ burnout_resultados|length }}</div>
+                <div class="text-muted">Posible Burnout</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="mbi-dashboard-card text-center p-3 stat-animated">
+                <div class="fs-2 fw-bold text-primary">{{ total_miembros }}</div>
+                <div class="text-muted">Total Miembros</div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <!-- Listas de miembros -->
+        <div class="col-lg-5">
+            <div class="mbi-dashboard-card p-4 mb-4 animate__animated animate__fadeInLeft">
+                <h5 class="fw-bold mb-3 text-success">Completaron el test</h5>
+                <ul class="list-group mb-3">
+                    {% for user in completaron %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ user.username }}
+                                {# Busca el resultado de este usuario para mostrar la fecha #}
+                                {% for resultado in resultados %}
+                                    {% if resultado.user.id == user.id %}
+                                        <span class="d-block small text-muted">
+                                            {{ resultado.date|date:"d/m/Y H:i" }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="badge bg-success">✓</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">Nadie ha completado el test aún.</li>
+                    {% endfor %}
+                </ul>
+                <h5 class="fw-bold mb-3 text-warning">Pendientes</h5>
+                <ul class="list-group">
+                    {% for miembro in no_respondieron %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ miembro.username }}
+                            <span class="badge bg-warning text-dark">⏳</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">Todos han completado el test.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mbi-dashboard-card p-4 animate__animated animate__fadeInLeft">
+                <h5 class="fw-bold mb-3 text-danger">Alertas de Burnout</h5>
+                <ul class="list-group">
+                    {% for resultado in burnout_resultados %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ resultado.user.username }}
+                            <span class="badge bg-danger">⚠️</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No se detectaron casos de burnout.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- Promedios y gráfico -->
+        <div class="col-lg-7">
+            <div class="mbi-dashboard-card p-4 mb-4 animate__animated animate__fadeInRight">
+                <h5 class="fw-bold mb-3 text-primary">Promedios del Equipo</h5>
+                <ul class="list-group mb-4">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Agotamiento emocional
+                        <span class="badge rounded-pill bg-success fs-6">{{ promedios.avg_agotamiento|floatformat:1 }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Despersonalización
+                        <span class="badge rounded-pill bg-warning text-dark fs-6">{{ promedios.avg_despersonalizacion|floatformat:1 }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Realización personal
+                        <span class="badge rounded-pill bg-info text-dark fs-6">{{ promedios.avg_realizacion|floatformat:1 }}</span>
+                    </li>
+                </ul>
+                <div class="chart-responsive mb-3">
+                    <canvas id="mbiRadarChart" width="480" height="480"></canvas>
+                </div>
+                <div class="mbi-legend">
+                    <strong>Leyenda:</strong>
+                    <ul>
+                        <li><span style="color:#A4BE7B; font-weight:bold;">Agotamiento emocional</span>: Sensación de estar exhausto por el trabajo.</li>
+                        <li><span style="color:#5F8D4E; font-weight:bold;">Despersonalización</span>: Actitudes y sentimientos negativos o distantes hacia los demás.</li>
+                        <li><span style="color:#285430; font-weight:bold;">Realización personal</span>: Sentimiento de competencia y éxito en el trabajo.</li>
+                    </ul>
+                    <small>Valores altos en agotamiento y despersonalización, y bajos en realización, indican mayor riesgo de burnout.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación de estadísticas
+    document.querySelectorAll('.stat-animated').forEach((el, i) => {
+        el.classList.add('animate__animated', 'animate__fadeInUp');
+        el.style.setProperty('--animate-delay', (i * 0.1) + 's');
+    });
+
+    // Radar Chart
+    const ctx = document.getElementById('mbiRadarChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: [
+                'Agotamiento emocional',
+                'Despersonalización',
+                'Realización personal'
+            ],
+            datasets: [{
+                label: 'Promedio equipo',
+                data: [
+                    {{ promedios.avg_agotamiento|default:0 }},
+                    {{ promedios.avg_despersonalizacion|default:0 }},
+                    {{ promedios.avg_realizacion|default:0 }}
+                ],
+                backgroundColor: 'rgba(164, 190, 123, 0.2)',
+                borderColor: '#285430',
+                borderWidth: 3,
+                pointBackgroundColor: ['#A4BE7B', '#5F8D4E', '#285430'],
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 8,
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#285430',
+                pointHoverRadius: 12
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(40, 84, 48, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#A4BE7B',
+                    borderWidth: 2,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: { display: true, color: 'rgba(164, 190, 123, 0.3)', lineWidth: 1 },
+                    grid: { color: 'rgba(164, 190, 123, 0.2)', lineWidth: 1 },
+                    suggestedMin: 0,
+                    suggestedMax: 40,
+                    pointLabels: {
+                        font: { size: 16, weight: 'bold' },
+                        color: '#285430',
+                        padding: 10
+                    },
+                    ticks: {
+                        color: '#285430',
+                        backdropColor: 'transparent',
+                        font: { size: 12 },
+                        stepSize: 10
+                    }
+                }
+            },
+            animation: {
+                duration: 900,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'base/base.html' %}
+{% block title %}Perfil | TeamZen{% endblock %}
+
+{% block extra_head %}
+<!-- Bootstrap 5 y Animate.css para animaciones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+    body {
+        background-color: #E5D9B6 !important;
+    }
+    .profile-card {
+        background: #fff;
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 24px rgba(40,84,48,0.10);
+        padding: 2rem 1.5rem;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .profile-card:hover {
+        box-shadow: 0 8px 32px rgba(40,84,48,0.18);
+        transform: translateY(-4px) scale(1.01);
+    }
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        background: #A4BE7B;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 2px 8px rgba(40,84,48,0.08);
+        transition: background 0.2s;
+    }
+    .profile-label {
+        color: #5F8D4E;
+        font-weight: 600;
+    }
+    .profile-value {
+        color: #285430;
+    }
+    .btn-success {
+        background: #5F8D4E !important;
+        border: none !important;
+    }
+    .btn-success:hover {
+        background: #285430 !important;
+    }
+    .btn-outline-success {
+        border-color: #5F8D4E !important;
+        color: #5F8D4E !important;
+    }
+    .btn-outline-success:hover {
+        background: #5F8D4E !important;
+        color: #fff !important;
+    }
+    .mbi-history-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 8px rgba(40,84,48,0.08);
+        padding: 1.5rem 1rem;
+        margin-top: 2rem;
+    }
+    .mbi-history-table th, .mbi-history-table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+    .mbi-history-table th {
+        color: #285430;
+    }
+    .badge-mbi {
+        font-size: 1rem;
+        border-radius: 0.7rem;
+        padding: 0.4em 1em;
+    }
+    @media (max-width: 576px) {
+        .profile-card {
+            padding: 1rem 0.5rem;
+        }
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+        .mbi-history-card {
+            padding: 1rem 0.3rem;
+        }
+        .mbi-history-table th, .mbi-history-table td {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-12">
+            <h2 class="mb-4 mt-5 text-center fw-bold animate__animated animate__fadeInDown" style="color:#285430;">Mi Perfil</h2>
+            <div class="card profile-card animate__animated animate__fadeInUp">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h5 class="card-title mb-3 profile-label">{{ user.username }}</h5>
+                    <p class="card-text mb-2">
+                        <span class="profile-label">Correo:</span>
+                        <span class="profile-value">{{ user.email }}</span>
+                    </p>
+                    <p class="card-text mb-2">
+                        <span class="profile-label">Rol:</span>
+                        <span class="profile-value">
+                            {% if user.role == 'empleado' %}Empleado
+                            {% elif user.role == 'lider' %}Líder
+                            {% elif user.role == 'admin' %}Administrador
+                            {% else %}Desconocido
+                            {% endif %}
+                        </span>
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-success mt-3 w-100 animate__animated animate__fadeInLeft">Ir a Inicio</a>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-success mt-2 w-100 animate__animated animate__fadeInRight">Editar perfil</a>
+                    <a href="{% url 'take_mbi_user' %}" class="btn btn-primary w-100 mt-3">
+                        <i class="bi bi-clipboard-check me-2"></i>Responder Test MBI
+                    </a>
+                </div>
+            </div>
+
+            <div class="mbi-history-card animate__animated animate__fadeInUp">
+                <h5 class="mb-3 text-center" style="color:#285430;">Historial de Test MBI</h5>
+                {% if mbi_history %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered mbi-history-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Resultado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for test in mbi_history %}
+                                    <tr>
+                                        <td>{{ test.date|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if test.burnout %}
+                                                <span class="badge bg-danger badge-mbi">Burnout</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary badge-mbi">Normal</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'mbi_result_user' test.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center mb-0">Aún no has respondido el test MBI.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
