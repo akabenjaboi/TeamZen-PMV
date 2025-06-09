@@ -1,0 +1,32 @@
+# Entorno virtual
+venv/
+ENV/
+env/
+.venv/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Archivos de configuración de VSCode
+.vscode/
+
+
+# Archivos de base de datos
+*.sqlite3
+db.sqlite3
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.bak
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de migraciones
+*/migrations/*.pyc
+*/migrations/__pycache__/

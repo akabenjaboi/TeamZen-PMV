@@ -8,6 +8,14 @@ from django.db.models import Avg
 from teams.models import Team
 from .models import MBIQuestion, MBIResult, MBIAnswer
 from .forms import MBIForm
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+from deepface import DeepFace
+from PIL import Image
+import numpy as np
+import io
 
 @login_required
 def take_mbi_view(request, team_id):
@@ -192,3 +200,28 @@ def interpretar_mbi(agotamiento, despersonalizacion, realizacion):
         interpretacion.append("📝 Diagnóstico general: Tus resultados no indican un riesgo alto de burnout, pero recuerda siempre cuidar tu salud mental y buscar apoyo si lo necesitas. ¡Sigue atento a tu bienestar!")
 
     return interpretacion
+
+def faceapi_emotion_view(request):
+    if request.method == 'POST':
+        photo = request.FILES.get('photo')
+        if not photo:
+            return JsonResponse({'error': 'No se recibió la imagen.'})
+
+        try:
+            # Leer la imagen y convertir a formato compatible con DeepFace
+            img = Image.open(photo)
+            img = img.convert('RGB')
+            img_np = np.array(img)
+
+            # Analizar emociones
+            result = DeepFace.analyze(img_path=img_np, actions=['emotion'], enforce_detection=False)
+            # DeepFace.analyze devuelve una lista de dicts si hay más de un rostro
+            if isinstance(result, list):
+                result = result[0]
+            emotions = result['emotion']
+            emotions_str = "<br>".join([f"{k.capitalize()}: {round(v, 2)}%" for k, v in emotions.items()])
+            return JsonResponse({'emotions': emotions_str})
+        except Exception as e:
+            return JsonResponse({'error': f'Error al analizar la imagen: {str(e)}'})
+
+    return render(request, 'mbi/faceapi_emotion.html')

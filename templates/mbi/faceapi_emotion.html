@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container text-center mt-5">
+    <h2>Predicción de riesgo de burnout</h2>
+    <p>Permite el acceso a tu cámara para complementar tu cuestionario con una predicción basada en tu expresión facial.</p>
+    <video id="video" width="480" height="360" autoplay style="border-radius: 12px; border: 2px solid #285430;"></video>
+    <br>
+    <button id="captureBtn" class="btn btn-success mt-4 mb-3" style="font-size: 1.2em;">Capturar y analizar</button>
+    <canvas id="canvas" width="480" height="360" style="display:none;"></canvas>
+    <div id="emotionResult" class="mt-4"></div>
+    <a href="{% url 'home' %}" class="btn btn-outline-primary mt-4" style="font-size: 1.1em;">
+        Volver al inicio
+    </a>
+</div>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const emotionResult = document.getElementById('emotionResult');
+
+    // Solicita acceso a la cámara
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { emotionResult.innerHTML = "No se pudo acceder a la cámara."; });
+
+    function interpretarEmociones(emociones) {
+        // Convierte el string a objeto
+        let lines = emociones.split('<br>');
+        let emocionesObj = {};
+        lines.forEach(line => {
+            let [k, v] = line.replace('%','').split(':');
+            if(k && v) emocionesObj[k.trim().toLowerCase()] = parseFloat(v.trim());
+        });
+
+        // Suma de emociones negativas
+        let negativas = (emocionesObj['sad'] || 0) + (emocionesObj['angry'] || 0) + (emocionesObj['fear'] || 0) + (emocionesObj['neutral'] || 0);
+
+        // Suma de emociones positivas
+        let positivas = (emocionesObj['happy'] || 0) + (emocionesObj['surprise'] || 0);
+
+        // Umbral simple para demo: si negativas > 40%, alerta de posible burnout futuro
+        let mensaje = "";
+        if (negativas > 40) {
+            mensaje = "<div class='alert alert-warning mt-3'><b>Predicción:</b> Tu expresión facial muestra signos de cansancio o malestar. Existe un riesgo potencial de burnout en el futuro si esta tendencia continúa. ¡Cuida tu bienestar!</div>";
+        } else if (positivas > 50) {
+            mensaje = "<div class='alert alert-success mt-3'><b>Predicción:</b> Tu expresión facial muestra emociones positivas. El riesgo de burnout es bajo. ¡Sigue cuidando tu bienestar!</div>";
+        } else {
+            mensaje = "<div class='alert alert-info mt-3'><b>Predicción:</b> No se detectan señales claras de riesgo de burnout en este momento.</div>";
+        }
+        mensaje += "<div class='mt-4 text-success' style='font-size:1.1em;'><b>¡Has complementado el cuestionario correctamente!</b></div>";
+        return mensaje;
+    }
+
+    captureBtn.onclick = function() {
+        emotionResult.innerHTML = ""; // Limpia el resultado anterior
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(function(blob) {
+            let formData = new FormData();
+            formData.append('photo', blob, 'photo.png');
+            fetch("{% url 'faceapi_emotion' %}", {
+                method: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.error){
+                    emotionResult.innerHTML = "<span class='text-danger'>" + data.error + "</span>";
+                } else {
+                    // Solo muestra el mensaje de predicción, no las emociones detectadas
+                    emotionResult.innerHTML = interpretarEmociones(data.emotions);
+                }
+            });
+        }, 'image/png');
+    }
+</script>
+{% endblock %}
