@@ -32,3 +32,8 @@ ejecuta con python manage.py poblar_demo
 
 super user: admin
 contraseña: admin123
+
+Demo
+demo@demo.cl
+Empleado
+demouser123

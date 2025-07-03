@@ -6,6 +6,8 @@ from mbi.models import MBIResult
 
 from .forms import TeamCreateForm, JoinTeamForm
 from .models import Team, TeamInviteCode, TeamMembershipRequest
+from .models import Integrante, Equipo, Proyecto, Rol
+from .forms import IntegranteForm, EquipoForm, ProyectoForm, RolForm
 
 @login_required
 def create_team_view(request):
@@ -146,3 +148,117 @@ def mbi_result_user(request, result_id):
     result = get_object_or_404(MBIResult, id=result_id, user=request.user, team__isnull=True)
     # ...otros cálculos...
     return render(request, 'mbi/mbi_result.html', {'result': result})
+
+# Menú principal CRUD
+@login_required
+def crud_menu_view(request):
+    return render(request, 'crud/crud_menu.html', {
+        'integrantes': Integrante.objects.all(),
+        'equipos': Equipo.objects.all(),
+        'proyectos': Proyecto.objects.all(),
+        'roles': Rol.objects.all(),
+    })
+
+# CRUD Integrante
+@login_required
+def integrante_create_view(request):
+    form = IntegranteForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/integrante_form.html', {'form': form, 'accion': 'Agregar'})
+
+@login_required
+def integrante_update_view(request, pk):
+    integrante = get_object_or_404(Integrante, pk=pk)
+    form = IntegranteForm(request.POST or None, instance=integrante)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/integrante_form.html', {'form': form, 'accion': 'Editar'})
+
+@login_required
+def integrante_delete_view(request, pk):
+    integrante = get_object_or_404(Integrante, pk=pk)
+    if request.method == 'POST':
+        integrante.delete()
+        return redirect('crud')
+    return render(request, 'crud/integrante_confirm_delete.html', {'integrante': integrante})
+
+# CRUD Equipo
+@login_required
+def equipo_create_view(request):
+    form = EquipoForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/equipo_form.html', {'form': form, 'accion': 'Agregar'})
+
+@login_required
+def equipo_update_view(request, pk):
+    equipo = get_object_or_404(Equipo, pk=pk)
+    form = EquipoForm(request.POST or None, instance=equipo)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/equipo_form.html', {'form': form, 'accion': 'Editar'})
+
+@login_required
+def equipo_delete_view(request, pk):
+    equipo = get_object_or_404(Equipo, pk=pk)
+    if request.method == 'POST':
+        equipo.delete()
+        return redirect('crud')
+    return render(request, 'crud/equipo_confirm_delete.html', {'equipo': equipo})
+
+# CRUD Proyecto
+@login_required
+def proyecto_create_view(request):
+    form = ProyectoForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/proyecto_form.html', {'form': form, 'accion': 'Agregar'})
+
+@login_required
+def proyecto_update_view(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    form = ProyectoForm(request.POST or None, instance=proyecto)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/proyecto_form.html', {'form': form, 'accion': 'Editar'})
+
+@login_required
+def proyecto_delete_view(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    if request.method == 'POST':
+        proyecto.delete()
+        return redirect('crud')
+    return render(request, 'crud/proyecto_confirm_delete.html', {'proyecto': proyecto})
+
+# CRUD Rol
+@login_required
+def rol_create_view(request):
+    form = RolForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/rol_form.html', {'form': form, 'accion': 'Agregar'})
+
+@login_required
+def rol_update_view(request, pk):
+    rol = get_object_or_404(Rol, pk=pk)
+    form = RolForm(request.POST or None, instance=rol)
+    if form.is_valid():
+        form.save()
+        return redirect('crud')
+    return render(request, 'crud/rol_form.html', {'form': form, 'accion': 'Editar'})
+
+@login_required
+def rol_delete_view(request, pk):
+    rol = get_object_or_404(Rol, pk=pk)
+    if request.method == 'POST':
+        rol.delete()
+        return redirect('crud')
+    return render(request, 'crud/rol_confirm_delete.html', {'rol': rol})

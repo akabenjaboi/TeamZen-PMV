@@ -1,0 +1,12 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h3>¿Estás seguro de eliminar este rol?</h3>
+    <p><strong>Nombre:</strong> {{ rol.nombre }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'crud' %}#roles" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

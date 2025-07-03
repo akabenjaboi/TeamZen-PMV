@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'teams',
     'mbi',
     'django.contrib.humanize',
+    'django_extensions',  # Solo si usas django-extensions
 ]
 
 MIDDLEWARE = [
@@ -76,14 +77,29 @@ WSGI_APPLICATION = 'TeamZenPMV.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# SQLite databaseb
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'mssql',
+        'NAME': 'TeamZen',  # Cambia esto por el nombre real de tu base
+        'USER': '',         # O usa '' si usas autenticación de Windows
+        'PASSWORD': '',  # O usa '' si usas autenticación de Windows
+        'HOST': 'BNJA-PC\\SQLEXPRESS',
+        'PORT': '',  # Deja vacío para el puerto por defecto
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',  # O el driver que tengas instalado
+             'trusted_connection': 'yes',  # Descomenta si usas autenticación de Windows
+        },
+    }
+}
+'''
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
